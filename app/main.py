@@ -1,15 +1,10 @@
 import datetime
 from collections import defaultdict
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
 from pathlib import Path
 
-from fastapi import (
-    FastAPI,
-    WebSocket,
-    WebSocketDisconnect,
-)
-
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
@@ -29,6 +24,7 @@ class WebsocketConnectionManager:
     async def broadcast(self, message: str, channel: str):
         for connection in self.active_connections.get(channel, []):
             await connection.send_text(message)
+
 
 ws_manager = WebsocketConnectionManager()
 
@@ -54,6 +50,7 @@ async def ping(channel: str):
     await ws_manager.broadcast(message, channel)
     return ""
 
+
 @app.get("/")
 async def index():
     # loading the vuejs index.html
@@ -62,5 +59,7 @@ async def index():
 
 app.mount(
     # vuejs assets
-    "/assets", StaticFiles(directory=Path(__file__).parent / "dist/assets"), name="assets"
+    "/assets",
+    StaticFiles(directory=Path(__file__).parent / "dist/assets"),
+    name="assets",
 )
