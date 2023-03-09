@@ -1,3 +1,4 @@
+import json
 import datetime
 from collections import defaultdict
 from pathlib import Path
@@ -38,7 +39,12 @@ async def websocket_endpoint(
     try:
         while True:
             data = await websocket.receive_text()
-            print(data)
+            try:
+                _data = json.loads(data)
+                if _data.get("f") == "add":
+                    data = str(sum(_data.get("params")))
+            except json.JSONDecodeError:
+                pass
             await ws_manager.broadcast(data, channel)
     except WebSocketDisconnect:
         ws_manager.disconnect(websocket, channel)
