@@ -5,3 +5,7 @@ import Websocket from './components/websocket.vue'
 <template>
   <Websocket/>
 </template>
+
+<style>
+@import 'bulma/css/bulma.css';
+</style>
