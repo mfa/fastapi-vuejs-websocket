@@ -51,15 +51,8 @@ async def ping(channel: str):
     return ""
 
 
-@app.get("/")
-async def index():
-    # loading the vuejs index.html
-    return HTMLResponse(open(Path(__file__).parent / "dist/index.html").read())
-
-
 app.mount(
-    # vuejs assets
-    "/assets",
-    StaticFiles(directory=Path(__file__).parent / "dist/assets"),
-    name="assets",
+    "/",
+    StaticFiles(directory=Path(__file__).parent / "dist", html=True),
+    name="vuejs-dist",
 )
