@@ -32,6 +32,5 @@ npm run build
 
 deploy:
 ```
-npm run build
-fly deploy --local-only
+(cd frontend; npm run build) && fly deploy --local-only
 ```
