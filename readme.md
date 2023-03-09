@@ -18,16 +18,15 @@ npm install
 npm run dev
 ```
 
-build (with output in `app/dist`)
-```
-npm run build
-```
-
-build+watch (with output in `app/dist`)
+build+watch (with output in `app/dist`) with localhost setup
 ```
 npm run watch
 ```
 
+build (with output in `app/dist`) with production setup
+```
+npm run build
+```
 
 ### deploy to fly.io
 

@@ -11,8 +11,11 @@ export default {
   },
   methods: {
     connect() {
-      // FIXME: for dev: ws://localhost:8000/ws/test1
-      this.connection = new WebSocket("wss://twilight-sun-160.fly.dev")
+      let url="ws://localhost:8000/ws/test1"
+      if (import.meta.env.MODE === 'production') {
+        url="wss://twilight-sun-160.fly.dev"
+      }
+      this.connection = new WebSocket(url)
       // receive broadcasts
       this.connection.onmessage = (event) => {
         this.msg = event.data
