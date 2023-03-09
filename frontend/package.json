@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && rm -rf ../app/dist && mv -f dist ../app/",
+    "build": "vite build --outDir ../app/dist --emptyOutDir",
+    "watch": "vite build --outDir ../app/dist --emptyOutDir --watch",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -18,9 +18,14 @@ npm install
 npm run dev
 ```
 
-build:
+build (with output in `app/dist`)
 ```
 npm run build
+```
+
+build+watch (with output in `app/dist`)
+```
+npm run watch
 ```
 
 
@@ -28,5 +33,6 @@ npm run build
 
 deploy:
 ```
+npm run build
 fly deploy --local-only
 ```
