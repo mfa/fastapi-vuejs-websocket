@@ -13,7 +13,7 @@ export default {
     connect() {
       let url="ws://localhost:8000/ws/test1"
       if (import.meta.env.MODE === 'production') {
-        url="wss://twilight-sun-160.fly.dev"
+        url="wss://twilight-sun-160.fly.dev/ws/test1"
       }
       this.connection = new WebSocket(url)
       // receive broadcasts
