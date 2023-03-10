@@ -7,15 +7,16 @@ export default {
     return {
       msg: "",
       sent: "",
+      channel: this.$route.params.channel,
     };
   },
   methods: {
     connect() {
-      let url="ws://localhost:8000/ws/test1"
+      let url="ws://localhost:8000/ws/"
       if (import.meta.env.MODE === 'production') {
-        url="wss://twilight-sun-160.fly.dev/ws/test1"
+        url="wss://twilight-sun-160.fly.dev/ws/"
       }
-      this.connection = new WebSocket(url)
+      this.connection = new WebSocket(url + this.channel)
       // receive broadcasts
       this.connection.onmessage = (event) => {
         this.msg = event.data
@@ -51,7 +52,7 @@ export default {
   <div class="container">
     <div class="columns mt-5">
       <div class="column is-10 is-offset-1">
-        <h3 class="is-size-3">Websocket testbed</h3>
+        <h3 class="is-size-3">Websocket: {{ channel }}</h3>
 
         <div class="card">
           <div class="card-content">
