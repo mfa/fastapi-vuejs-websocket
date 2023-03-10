@@ -3,8 +3,9 @@ import datetime
 from collections import defaultdict
 from pathlib import Path
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
+from fastapi.exceptions import HTTPException
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
@@ -50,15 +51,13 @@ async def websocket_endpoint(
         ws_manager.disconnect(websocket, channel)
 
 
-@app.get("/ping/{channel}")
-async def ping(channel: str):
-    message = str(datetime.datetime.now())
-    await ws_manager.broadcast(message, channel)
-    return ""
+@app.exception_handler(404)
+async def redirect_all_requests_to_frontend(request: Request, exc: HTTPException):
+    return HTMLResponse(open(Path(__file__).parent / "dist/index.html").read())
 
 
 app.mount(
-    "/",
-    StaticFiles(directory=Path(__file__).parent / "dist", html=True),
-    name="vuejs-dist",
+    "/assets",
+    StaticFiles(directory=Path(__file__).parent / "dist/assets"),
+    name="assets",
 )
