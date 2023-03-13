@@ -84,7 +84,7 @@ export default {
           <footer class="card-footer">
             <a href="#" class="card-footer-item" v-on:click="sendSymbol('🪨')">🪨 (rock)</a>
             <a href="#" class="card-footer-item" v-on:click="sendSymbol('📰')">📰 (paper)</a>
-            <a href="#" class="card-footer-item" v-on:click="sendSymbol('✂️')">✂️(scissor)</a>
+            <a href="#" class="card-footer-item" v-on:click="sendSymbol('✂️')">✂️ (scissors)</a>
           </footer>
         </div>
       </div>
