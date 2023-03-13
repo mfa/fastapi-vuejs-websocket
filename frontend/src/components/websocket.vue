@@ -32,9 +32,9 @@ export default {
     ws_send(message) {
       this.connection.send(message)
     },
-    triggerSend(char) {
+    sendSymbol(char) {
       this.symbol = char
-      this.ws_send(JSON.stringify({'f': 'send', 'user_id': this.user, 'char': char}))
+      this.ws_send(JSON.stringify({'f': 'symbol', 'user_id': this.user, 'char': char}))
     },
     getRandomInt(max) {
       return Math.floor(Math.random() * max)
@@ -82,9 +82,9 @@ export default {
             </div>
           </div>
           <footer class="card-footer">
-            <a href="#" class="card-footer-item" v-on:click="triggerSend('🪨')">🪨 (rock)</a>
-            <a href="#" class="card-footer-item" v-on:click="triggerSend('📰')">📰 (paper)</a>
-            <a href="#" class="card-footer-item" v-on:click="triggerSend('✂️')">✂️(scissor)</a>
+            <a href="#" class="card-footer-item" v-on:click="sendSymbol('🪨')">🪨 (rock)</a>
+            <a href="#" class="card-footer-item" v-on:click="sendSymbol('📰')">📰 (paper)</a>
+            <a href="#" class="card-footer-item" v-on:click="sendSymbol('✂️')">✂️(scissor)</a>
           </footer>
         </div>
       </div>

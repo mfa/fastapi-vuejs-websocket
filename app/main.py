@@ -19,11 +19,10 @@ def get_winner(played):
     paper = "📰"
     scissors = "✂️"
     uid, move = list(played.keys()), list(played.values())
-    for i in range(0, 2):
-        j = (i + 1) % 2
+    for i, j in ((0, 1), (1, 0)):
         # same move
         if move[i] == move[j]:
-            return None
+            return "draw"
         # rock breaks scissors, scissors cuts paper, paper covers rock.
         if (
             (move[i] == rock and move[j] == scissors)
@@ -41,18 +40,16 @@ class GameState:
     last_games: Optional[List] = field(default_factory=list)
     last_update: Optional[str] = None
 
+    def add_player(self, user_id):
+        self.players.append(user_id)
+        self.scores[user_id] = 0
+        self.sent[user_id] = None
+
     @property
     def is_sent(self):
         return {k: v is not None for k, v in self.sent.items()}
 
     def serialize(self):
-        d = {
-            "players": self.players,
-            "last_update": self.last_update,
-            "scores": self.scores,
-            "is_sent": self.is_sent,
-            "last_games": self.last_games,
-        }
         if all([i for i in self.is_sent.values()]) and len(self.is_sent) > 1:
             # match random pairs and compare
             self.last_games = []
@@ -60,16 +57,21 @@ class GameState:
                 played = {pair[i]: self.sent.get(pair[i]) for i in range(2)}
                 winner = get_winner(played)
                 g = {"players": pair, "played": played, "winner": winner}
-                if g["winner"]:
+                if g["winner"] in self.scores:
                     self.scores[g["winner"]] += 1
                 else:
-                    g["winner"] = "draw"
+                    # draw: both get points
+                    for p in pair:
+                        self.scores[p] += 1
                 self.last_games.append(g)
-
-            d["last_games"] = self.last_games
             self.sent = {k: None for k in self.players}
-            d["is_sent"] = self.is_sent
-        return d
+        return {
+            "players": self.players,
+            "last_update": self.last_update,
+            "scores": self.scores,
+            "is_sent": self.is_sent,
+            "last_games": self.last_games,
+        }
 
 
 game_states = defaultdict(lambda: GameState())
@@ -107,16 +109,11 @@ async def websocket_endpoint(
             try:
                 _data = json.loads(data)
                 if _data.get("f") == "add_user":
-                    players = game_states[channel].players
-                    if _data.get("user_id") not in players:
-                        players.append(_data.get("user_id"))
-                        game_states[channel].players = list(set(players))
-                        game_states[channel].scores[_data.get("user_id")] = 0
-                        game_states[channel].sent[_data.get("user_id")] = None
-                if _data.get("f") == "send":
+                    if _data.get("user_id") not in game_states[channel].players:
+                        game_states[channel].add_player(_data.get("user_id"))
+                if _data.get("f") == "symbol":
                     game_states[channel].sent[_data.get("user_id")] = _data.get("char")
-                if False:
-                    game_states[channel].scores[_data.get("user_id")] += 1
+                # add timestamp
                 game_states[channel].last_update = str(datetime.datetime.utcnow())
             except json.JSONDecodeError:
                 pass
