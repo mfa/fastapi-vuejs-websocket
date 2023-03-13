@@ -13,6 +13,10 @@ const router = createRouter({
     {
       path: '/:channel',
       component: () => import('./components/websocket.vue')
+    },
+    {
+      path: '/:catchAll(.*)',
+      component: () => import('./components/notfound.vue')
     }
   ]
 })
