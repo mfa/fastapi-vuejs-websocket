@@ -8,7 +8,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      component: () => import('./components/create.vue')
+      component: () => import('./components/createGame.vue')
     },
     {
       path: '/:channel',
