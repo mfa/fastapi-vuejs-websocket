@@ -1,12 +1,12 @@
 <script type="module">
-import { createApp, ref } from 'vue'
+import { createApp, ref, computed } from 'vue'
 import moment from "moment"
 
 export default {
   data() {
     return {
-      msg: "",
-      sent: "",
+      symbol: '',
+      state: {},
       channel: this.$route.params.channel,
     };
   },
@@ -19,28 +19,31 @@ export default {
       this.connection = new WebSocket(url + this.channel)
       // receive broadcasts
       this.connection.onmessage = (event) => {
-        this.msg = event.data
+        this.state = JSON.parse(event.data)
       }
+      // set default username and store it
+      if (!localStorage.getItem("user"))
+        localStorage.setItem("user", 'user-' + this.getRandomInt(10000))
       // send message on connect to server, which will be broadcasted
       this.connection.onopen = (event) => {
-        this.ws_send("on connect ping: " + moment().toISOString())
+        this.ws_send(JSON.stringify({'f': 'add_user', 'user_id': this.user}))
       }
     },
     ws_send(message) {
-      this.sent = message
       this.connection.send(message)
     },
-    triggerPing() {
-      this.ws_send("ping: " + moment().toISOString())
-    },
-    triggerAddCall() {
-      this.ws_send(JSON.stringify({'f': 'add', 'params': [
-        this.getRandomInt(99), this.getRandomInt(99), this.getRandomInt(99)
-      ]}))
+    triggerSend(char) {
+      this.symbol = char
+      this.ws_send(JSON.stringify({'f': 'send', 'user_id': this.user, 'char': char}))
     },
     getRandomInt(max) {
       return Math.floor(Math.random() * max)
-    }
+    },
+  },
+  computed: {
+    user() {
+      return localStorage.getItem("user");
+    },
   },
   created() {
     this.connect()
@@ -52,39 +55,51 @@ export default {
   <div class="container">
     <div class="columns mt-5">
       <div class="column is-10 is-offset-1">
-        <h3 class="is-size-3">Websocket: {{ channel }}</h3>
-
         <div class="card">
+          <div class="card-header">
+            <p class="card-header-title">
+              Channel: {{ channel }}
+            </p>
+          </div>
           <div class="card-content">
             <div class="content">
-              <div class="columns">
-                <div class="column is-3">
-                  <p>
-                    <strong>
-                      sent:
-                    </strong>
-                  </p>
-                  <p>
-                    <strong>
-                      received:
-                    </strong>
-                  </p>
-                </div>
-                <div class="column is-9">
-                  <p>
-                    {{ sent }}
-                  </p>
-                  <p>
-                    {{ msg }}
-                  </p>
-                </div>
-              </div>
+              <h3 class="is-size-3">User:</h3>
+              <p>
+                <li v-for="index in state.players">
+                  {{ index }} -- sent: {{ state.is_sent[index] }}
+                </li>
+              </p>
+              <h3 class="is-size-3">Last Games</h3>
+              <p>
+                <li v-for="item in state.last_games">
+                  {{ item.played }} - winner: {{ item.winner }}
+                </li>
+              </p>
+              <h3 class="is-size-3">Score</h3>
+              <p>
+                {{ state.scores }}
+              </p>
             </div>
           </div>
           <footer class="card-footer">
-            <a href="#" class="card-footer-item" v-on:click="triggerPing">Trigger Ping</a>
-            <a href="#" class="card-footer-item" v-on:click="triggerAddCall">Trigger "add"</a>
+            <a href="#" class="card-footer-item" v-on:click="triggerSend('🪨')">🪨 (rock)</a>
+            <a href="#" class="card-footer-item" v-on:click="triggerSend('📰')">📰 (paper)</a>
+            <a href="#" class="card-footer-item" v-on:click="triggerSend('✂️')">✂️(scissor)</a>
           </footer>
+        </div>
+      </div>
+    </div>
+    <div class="columns mt-5">
+      <div class="column is-10 is-offset-1">
+        <div class="card">
+          <div class="card-header">
+            <p class="card-header-title">
+              Your user id: {{ user }}
+            </p>
+          </div>
+          <div class="card-content">
+            Your last sent symbol: {{ symbol }}
+          </div>
         </div>
       </div>
     </div>
